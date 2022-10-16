@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<script src="final_weight.js"></script>
+<script>
+	const HEIGHT = 16;
+	const WIDTH = 16;
+
+	let BITMAP = null;
+
+	function renderBitmap(bitmap) {
+		document.getElementById("foo").innerHTML = "";
+		for (let i = 0; i < HEIGHT * WIDTH; i++) {
+			// i is WIDTH * y + x
+			const x = i % WIDTH;
+			const y = (i - x) / WIDTH;
+			if (bitmap[i] === 1) {
+				document.getElementById("foo").innerHTML +=
+					`<div style="width: 10px; height: 10px; top: ${y * 10}px; left: ${x * 10}px; background-color: black; position:absolute"></div>`
+			}
+		}
+	}
+
+	function initialize() {
+		BITMAP = Array.from({ length: HEIGHT * WIDTH }, () => Math.random() <= 0.5 ? 1 : -1);
+		renderBitmap(BITMAP);
+	}
+
+	function update() {
+		// which pixel should I update?
+		const index_of_update = Math.random() * BITMAP.length | 0;
+		const dot_prod = WEIGHT[index_of_update].map((w_i, i) => w_i * BITMAP[i]).reduce((a, b) => a + b, 0);
+		BITMAP[index_of_update] = dot_prod >= 0 ? 1 : -1;
+		renderBitmap(BITMAP);
+	}
+
+	let intervalID;
+	function startTimer() {
+		intervalID = setInterval(update, 10);
+	}
+	function stopTimer() {
+		clearInterval(intervalID);
+	}
+</script>
+<button onclick="initialize()">initialize</button>
+<button onclick="update()">update once</button>
+<button onclick="startTimer()">run</button>
+<button onclick="stopTimer()">stop</button>
+<div id="foo" style="margin-top: 5px; position: absolute; width: 160px; height: 160px;">
+</div>
