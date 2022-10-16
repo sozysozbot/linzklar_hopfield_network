@@ -37,17 +37,23 @@
 	function initialize() {
 		initialize_file_selection();
 		initialize_bitmap();
+		document.getElementById("randomize").disabled = false;
+		document.getElementById("start").disabled = false;
 	}
 
 	function renderBitmap(bitmap) {
-		document.getElementById("foo").innerHTML = "";
-		for (let i = 0; i < HEIGHT * WIDTH; i++) {
-			// i is WIDTH * y + x
-			const x = i % WIDTH;
-			const y = (i - x) / WIDTH;
-			if (bitmap[i] === 1) {
-				document.getElementById("foo").innerHTML +=
-					`<div style="width: 10px; height: 10px; top: ${y * 10}px; left: ${x * 10}px; background-color: black; position:absolute"></div>`
+		const canvas = document.getElementById('canvas');
+		const PIXEL_SIZE = 10;
+		if (canvas.getContext) {
+			const ctx = canvas.getContext('2d');
+			ctx.clearRect(0, 0, WIDTH * PIXEL_SIZE, HEIGHT * PIXEL_SIZE);
+			for (let i = 0; i < HEIGHT * WIDTH; i++) {
+				// i is WIDTH * y + x
+				const x = i % WIDTH;
+				const y = (i - x) / WIDTH;
+				if (bitmap[i] === 1) {
+					ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+				}
 			}
 		}
 	}
@@ -71,21 +77,53 @@
 	let intervalID;
 	function startTimer() {
 		intervalID = setInterval(update, 10);
+		document.getElementById("start").disabled = true;
+		document.getElementById("initialize").disabled = true;
+		document.getElementById("stop").disabled = false;
 	}
 	function stopTimer() {
 		clearInterval(intervalID);
+		intervalID = null;
+		document.getElementById("start").disabled = false;
+		document.getElementById("initialize").disabled = false;
+		document.getElementById("stop").disabled = true;
 	}
 </script>
-<button onclick="initialize()">燐字を n 枚眺める</button> 
+<h2>遊び方</h2>
+<p>燐字を Hopfield Network に n 枚記憶させ、それを思い起こさせようとする。</p>
+<p>n = 1, 2 だと、だいたいの場合「入力した字そのもの」か「その白黒反転」が出てくる</p>
+<p>n が大きすぎると、覚えきれなくて真っ白か真っ黒しか出てこなくなる</p>
+<p>n がちょうどいい感じだと、記憶が混線して、それっぽい斬新なやつを吐いてくれる<b>かも</b></p>
+<hr>
+<h2>アルゴリズム</h2>
+<p>異常にシンプルですごい。</p>
+<ul>
+	<li>「眺める」<ul>
+		<li>白は -1、黒は 1 とし、16 x 16 のピクセルを一列に並べ、v とする</li>
+		<li>w[k][l] = v[k] * v[l]（ただし k と l が等しいときはゼロ）とした 256 x 256 の行列を各燐字ごとに用意し、それらの行列の平均を W とする</li>
+	</ul></li>
+	<li>「思い起こす」<ul>
+		<li>ランダムな白黒で初期化する。白は -1、黒は 1 とし、一列に並べ、V とする</li>
+		<li>各ステップごとに、ピクセルを一つ乱択し、それを更新する。 乱択されたピクセルが j 番目なら、以下のように更新する<ul>
+			<li>Σ_k W[k][j] * V[k] が 0 以上なら黒、さもなくば白</li>
+		</ul></li>
+	</ul></li>
+</ul>
+
+<hr>
+<h2>本体</h2>
+<button id="initialize" onclick="initialize()">燐字を n 枚眺める</button> 
 <label>n = </label><input type="number" value="4" id="how_many">
 
 <p>見たデータ</p>
 <div id="in_memory"></div>
 
 <p>記憶から思い起こしたデータ</p>
-<button onclick="initialize_bitmap()">randomize</button>
-<button onclick="startTimer()">start</button>
-<button onclick="stopTimer()">stop</button>
+<button id="randomize" onclick="initialize_bitmap()" disabled>randomize</button>
+<button id="start" onclick="startTimer()" disabled>start</button>
+<button id="stop" onclick="stopTimer()" disabled>stop</button>
 <div>t = <span id="t">0</span></div>
-<div id="foo" style="margin-top: 5px; position: absolute; width: 160px; height: 160px;">
-</div>
+<canvas id="canvas" width="160" height="160"></canvas>
+<hr>
+<h2>詳しい解説（英語）</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/piF6D6CQxUw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
