@@ -29,7 +29,7 @@
 		SELECTED_FILES = Array.from({ length }, () => file_names[file_names.length * Math.random() | 0]);
 		document.getElementById("in_memory").innerHTML = "";
 		for (let i = 0; i < SELECTED_FILES.length; i++) {
-			document.getElementById("in_memory").innerHTML += `<img src="../pngs/${SELECTED_FILES[i]}" width="32">`;
+			document.getElementById("in_memory").innerHTML += `<img src="pngs/${SELECTED_FILES[i]}" width="32">`;
 		}
 		WEIGHT = get_weight_from_vectors(SELECTED_FILES.map(file => pixels[file]));
 	}
@@ -77,7 +77,7 @@
 	}
 </script>
 <button onclick="initialize()">燐字を n 枚眺める</button> 
-<label>n = </label><input type="number" value="6" id="how_many">
+<label>n = </label><input type="number" value="4" id="how_many">
 
 <p>見たデータ</p>
 <div id="in_memory"></div>
