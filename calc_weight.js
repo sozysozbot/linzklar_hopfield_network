@@ -25,12 +25,22 @@ var WIDTH = 16;
 var pixel_vectors = JSON.parse(fs.readFileSync("pixels.json", { encoding: "utf-8" }));
 var N = pixel_vectors.length;
 var final_weight = [];
-for (var m = 0; m < N; m++) {
-    for (var k = 0; k < HEIGHT * WIDTH; k++) {
-        final_weight[k] = Array.from({ length: HEIGHT * WIDTH }, function () { return 0; });
-        for (var l = 0; l < HEIGHT * WIDTH; l++) {
+var _loop_1 = function (k) {
+    final_weight[k] = Array.from({ length: HEIGHT * WIDTH }, function () { return 0; });
+    var _loop_2 = function (l) {
+        if (Math.random() < 0.001) {
+            var w = pixel_vectors.map(function (v) { return v[k] * v[l]; });
+            console.log({ k: k, l: l, positive: w.filter(function (a) { return a === 1; }).length, negative: w.filter(function (a) { return a === -1; }).length });
+        }
+        for (var m = 0; m < N; m++) {
             final_weight[k][l] += k == l ? 0 : pixel_vectors[m][k] * pixel_vectors[m][l] / N;
         }
+    };
+    for (var l = 0; l < HEIGHT * WIDTH; l++) {
+        _loop_2(l);
     }
+};
+for (var k = 0; k < HEIGHT * WIDTH; k++) {
+    _loop_1(k);
 }
 fs.writeFileSync("final_weight.json", JSON.stringify(final_weight, null, 4));
