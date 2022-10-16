@@ -1,10 +1,43 @@
 <!DOCTYPE html>
-<script src="final_weight.js"></script>
+<meta charset="utf-8">
+<script src="pixels.js"></script>
 <script>
 	const HEIGHT = 16;
 	const WIDTH = 16;
 
+	function get_weight_from_vectors(pixel_vectors) {
+		const N = pixel_vectors.length;
+		const final_weight = [];
+		for (let k = 0; k < HEIGHT * WIDTH; k++) {
+			final_weight[k] = Array.from({ length: HEIGHT * WIDTH }, () => 0);
+			for (let l = 0; l < HEIGHT * WIDTH; l++) {
+				const w = pixel_vectors.map(v => v[k] * v[l])
+				if (Math.random() < 0.001) {
+					console.log({ k, l, positive: w.filter(a => a === 1).length, negative: w.filter(a => a === -1).length });
+				}
+				final_weight[k][l] = k === l ? 0 : w.reduce((a, b) => a + b, 0) / N
+			}
+		}
+		return final_weight;
+	}
+
 	let BITMAP = null;
+	let SELECTED_FILES = null;
+	let WEIGHT = null;
+	let T = 0;
+
+	function initialize() {
+		const file_names = Object.keys(pixels);
+		SELECTED_FILES = Array.from({ length: 6 }, () => file_names[file_names.length * Math.random() | 0]);
+		document.getElementById("in_memory").innerHTML = "";
+		for (let i = 0; i < SELECTED_FILES.length; i++) {
+			document.getElementById("in_memory").innerHTML += `<img src="../pngs/${SELECTED_FILES[i]}" width="32">`;
+		}
+		WEIGHT = get_weight_from_vectors(SELECTED_FILES.map(file => pixels[file]));
+
+		BITMAP = Array.from({ length: HEIGHT * WIDTH }, () => Math.random() <= 0.5 ? 1 : -1);
+		renderBitmap(BITMAP);
+	}
 
 	function renderBitmap(bitmap) {
 		document.getElementById("foo").innerHTML = "";
@@ -19,17 +52,14 @@
 		}
 	}
 
-	function initialize() {
-		BITMAP = Array.from({ length: HEIGHT * WIDTH }, () => Math.random() <= 0.5 ? 1 : -1);
-		renderBitmap(BITMAP);
-	}
-
 	function update() {
+		T++;
 		// which pixel should I update?
 		const index_of_update = Math.random() * BITMAP.length | 0;
 		const dot_prod = WEIGHT[index_of_update].map((w_i, i) => w_i * BITMAP[i]).reduce((a, b) => a + b, 0);
 		BITMAP[index_of_update] = dot_prod >= 0 ? 1 : -1;
 		renderBitmap(BITMAP);
+		document.getElementById("t").innerHTML = T;
 	}
 
 	let intervalID;
@@ -41,8 +71,15 @@
 	}
 </script>
 <button onclick="initialize()">initialize</button>
-<button onclick="update()">update once</button>
-<button onclick="startTimer()">run</button>
+<!--<button onclick="update()">update once</button>-->
+
+
+<p>見たデータ</p>
+<div id="in_memory"></div>
+
+<p>記憶から思い起こしたデータ</p>
+<button onclick="startTimer()">start</button>
 <button onclick="stopTimer()">stop</button>
+<div>t = <span id="t">0</span></div>
 <div id="foo" style="margin-top: 5px; position: absolute; width: 160px; height: 160px;">
 </div>

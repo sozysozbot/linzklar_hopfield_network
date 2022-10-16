@@ -57,7 +57,7 @@ const WIDTH = 16;
 						weight[k][l] = k == l ? 0 : v[k] * v[l];
 					}
 				}*/
-				fs.writeFileSync(`txts/${file}.txt`, JSON.stringify(v) + ",\n");
+				fs.writeFileSync(`txts/${file}.txt`, `"${file}": ` + JSON.stringify(v) + ",\n");
 				//console.log(JSON.stringify(weight));
 				// console.log(`${file}:\n${txt}`);
 				//weights.push(weight);
