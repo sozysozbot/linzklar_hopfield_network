@@ -1,0 +1,20 @@
+{
+  "name": "linzklar_hopfield_network",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jekto.vatimeliju / hsjoihs",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "pngjs": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/pngjs": "^6.0.1",
+    "@types/fs-extra": "9.0.13",
+    "@types/node": "16.11.41"
+  }
+}
