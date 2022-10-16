@@ -28,13 +28,11 @@ var final_weight = [];
 var _loop_1 = function (k) {
     final_weight[k] = Array.from({ length: HEIGHT * WIDTH }, function () { return 0; });
     var _loop_2 = function (l) {
+        var w = pixel_vectors.map(function (v) { return v[k] * v[l]; });
         if (Math.random() < 0.001) {
-            var w = pixel_vectors.map(function (v) { return v[k] * v[l]; });
             console.log({ k: k, l: l, positive: w.filter(function (a) { return a === 1; }).length, negative: w.filter(function (a) { return a === -1; }).length });
         }
-        for (var m = 0; m < N; m++) {
-            final_weight[k][l] += k == l ? 0 : pixel_vectors[m][k] * pixel_vectors[m][l] / N;
-        }
+        final_weight[k][l] = k === l ? 0 : w.reduce(function (a, b) { return a + b; }, 0) / N;
     };
     for (var l = 0; l < HEIGHT * WIDTH; l++) {
         _loop_2(l);
