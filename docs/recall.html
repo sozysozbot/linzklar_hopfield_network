@@ -21,22 +21,26 @@
 		return final_weight;
 	}
 
-	let BITMAP = null;
 	let SELECTED_FILES = null;
 	let WEIGHT = null;
+
+	let BITMAP = null;
 	let T = 0;
 
-	function initialize() {
+	function initialize_file_selection() {
 		const file_names = Object.keys(pixels);
-		SELECTED_FILES = Array.from({ length: 6 }, () => file_names[file_names.length * Math.random() | 0]);
+		const length = Number(document.getElementById("how_many").value);
+		SELECTED_FILES = Array.from({ length }, () => file_names[file_names.length * Math.random() | 0]);
 		document.getElementById("in_memory").innerHTML = "";
 		for (let i = 0; i < SELECTED_FILES.length; i++) {
 			document.getElementById("in_memory").innerHTML += `<img src="../pngs/${SELECTED_FILES[i]}" width="32">`;
 		}
 		WEIGHT = get_weight_from_vectors(SELECTED_FILES.map(file => pixels[file]));
+	}
 
-		BITMAP = Array.from({ length: HEIGHT * WIDTH }, () => Math.random() <= 0.5 ? 1 : -1);
-		renderBitmap(BITMAP);
+	function initialize() {
+		initialize_file_selection();
+		initialize_bitmap();
 	}
 
 	function renderBitmap(bitmap) {
@@ -62,6 +66,12 @@
 		document.getElementById("t").innerHTML = T;
 	}
 
+	function initialize_bitmap() {
+		T = 0;
+		BITMAP = Array.from({ length: HEIGHT * WIDTH }, () => Math.random() <= 0.5 ? 1 : -1);
+		renderBitmap(BITMAP);
+	}
+
 	let intervalID;
 	function startTimer() {
 		intervalID = setInterval(update, 10);
@@ -70,14 +80,14 @@
 		clearInterval(intervalID);
 	}
 </script>
-<button onclick="initialize()">initialize</button>
-<!--<button onclick="update()">update once</button>-->
-
+<button onclick="initialize()">燐字を n 枚眺める</button> 
+<label>n = </label><input type="number" value="6" id="how_many">
 
 <p>見たデータ</p>
 <div id="in_memory"></div>
 
 <p>記憶から思い起こしたデータ</p>
+<button onclick="initialize_bitmap()">randomize</button>
 <button onclick="startTimer()">start</button>
 <button onclick="stopTimer()">stop</button>
 <div>t = <span id="t">0</span></div>
